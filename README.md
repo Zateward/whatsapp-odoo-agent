@@ -1,13 +1,16 @@
-In your .env file paste this:
+# How to start
+
+1. Start tunnel with ngrok
 ```
-twilio_account_sid = "TWILIO ACCOUNT SID"
-twilio_auth_token = "TWILIO AUTH TOKEN"
-twilio_whats_app_number = "whatsapp:+############"
-
-odoo_url = "YOUR ODOO URL"
-odoo_db = "YOUR ODOO DB"
-odoo_password = "YOUR ODOO PASSWORD"
-odoo_username = "YOUR ODOO USERNAME"
-
-gemini_api_key = "YOUR_GEMINI_API_KEY"
+ngrok http 8000
+```
+2. Start main app
+```
+uvicorn main:app --reload --port 8000
+```
+If you want to start it with `python3 main.py` In your `./main.py` file you must have this:
+```
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 ```
