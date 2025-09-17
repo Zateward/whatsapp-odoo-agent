@@ -1,22 +1,47 @@
+# from fastapi import FastAPI, Form
+# from fastapi.responses import PlainTextResponse
+# from app.twilio_client import TwilioWhatsApp
+# from app.sales_agent import SalesAgent
+
+# app = FastAPI()
+# twilio = TwilioWhatsApp()
+# agent = SalesAgent()
+
+# @app.post("/webhook")
+# async def whatsapp_webhook(From: str = Form(...), Body: str = Form(...)):
+#     print(f"📩 Mensaje recibido de {From}: {Body}")
+
+#     # Procesamos el mensaje con el agente de ventas
+#     reply = agent.handle_message(Body)
+#     print(f"🤖 Respuesta del agente: {reply}")
+
+#     # Respondemos por WhatsApp
+#     twilio.send_message(From, reply)
+
+#     # Twilio necesita algo en el webhook
+#     return PlainTextResponse("OK")
+
 from fastapi import FastAPI, Form
 from fastapi.responses import PlainTextResponse
 from app.twilio_client import TwilioWhatsApp
 from app.sales_agent import SalesAgent
+from app.contest_agent import ContestAgent
 
 app = FastAPI()
 twilio = TwilioWhatsApp()
-agent = SalesAgent()
+sales_agent = SalesAgent()
+contest_agent = ContestAgent()
 
 @app.post("/webhook")
 async def whatsapp_webhook(From: str = Form(...), Body: str = Form(...)):
     print(f"📩 Mensaje recibido de {From}: {Body}")
 
-    # Procesamos el mensaje con el agente de ventas
-    reply = agent.handle_message(Body)
-    print(f"🤖 Respuesta del agente: {reply}")
+    # Primero revisamos si es concurso
+    reply = contest_agent.handle_message(From, Body)
 
-    # Respondemos por WhatsApp
+    # Si devuelve None, lo enviamos al agente de ventas
+    if reply is None:
+        reply = sales_agent.handle_message(Body)
+
     twilio.send_message(From, reply)
-
-    # Twilio necesita algo en el webhook
     return PlainTextResponse("OK")
