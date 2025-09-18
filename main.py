@@ -36,12 +36,18 @@ contest_agent = ContestAgent()
 async def whatsapp_webhook(From: str = Form(...), Body: str = Form(...)):
     print(f"📩 Mensaje recibido de {From}: {Body}")
 
-    # Primero revisamos si es concurso
-    reply = contest_agent.handle_message(From, Body)
+    # Asegurar que el número tiene el prefijo correcto
+    if From.startswith("whatsapp:") and not From.startswith("whatsapp:+"):
+        From = From.replace("whatsapp:", "whatsapp:+521", 1)
 
-    # Si devuelve None, lo enviamos al agente de ventas
-    if reply is None:
-        reply = sales_agent.handle_message(Body)
+    reply = agent.handle_message(Body)
+    print(f"🤖 Respuesta del agente: {reply}")
 
-    twilio.send_message(From, reply)
+    # Enviar la respuesta
+    try:
+        sid = twilio.send_message(From, reply)
+        print(f"✅ Mensaje enviado con SID: {sid}")
+    except Exception as e:
+        print(f"❌ Error enviando mensaje: {e}")
+
     return PlainTextResponse("OK")
