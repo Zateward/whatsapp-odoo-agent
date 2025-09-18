@@ -40,7 +40,7 @@ async def whatsapp_webhook(From: str = Form(...), Body: str = Form(...)):
     if From.startswith("whatsapp:") and not From.startswith("whatsapp:+"):
         From = From.replace("whatsapp:", "whatsapp:+521", 1)
 
-    reply = agent.handle_message(Body)
+    reply = sales_agent.handle_message(Body)
     print(f"🤖 Respuesta del agente: {reply}")
 
     # Enviar la respuesta
